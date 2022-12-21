@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+/** Constantes para as strings a serem lidas */
 #define MAX_LINE 100
 #define MAX_ACTION 10
 #define MAX_ID_SIZE 10
@@ -12,11 +13,11 @@ typedef struct Carta
 
 } carta;
 
-typedef struct Players
+typedef struct Jogars
 {
   char jogadores[99];
 
-} Players;
+} jogars;
 
 void debug(char *message)
 {
@@ -30,13 +31,14 @@ int main()
   carta mao[99];
   carta mesa;
   char *token;
-  Players jogs[99];
+  jogars jogs[99];
+  // Obs: As variáveis deste template foram definidas apenas para o código compilar e rodar.
+  // Então, cabe a você usar as variáveis adequadas em função do que está lendo.
+  char temp[MAX_LINE];     // string para leitura temporária de hasPlayeds
+  char my_id[MAX_ID_SIZE]; // identificador do seu bot
 
-  char temp[MAX_LINE];
-  char my_id[MAX_ID_SIZE];
-
-  setbuf(stdin, NULL);
-  setbuf(stdout, NULL);
+  setbuf(stdin, NULL);  // stdin, stdout e stderr não terão buffers
+  setbuf(stdout, NULL); // assim, nada é "guarhasPlayed temporariamente"
   setbuf(stderr, NULL);
 
   scanf("PLAYERS %[^\n]\n", temp);
@@ -47,10 +49,13 @@ int main()
     njogadores++;
     token = strtok(NULL, " ");
   }
-
+  // Caso queira imprimir uma mensagem para debugar, pode chamar 'debug()' passando uma string.
+  // Por exemplo: debug(temp);
   debug(temp);
 
+  // Lê o identificador do próprio bot. Isso é importante para testar quando é sua vez.
   scanf("YOU %s\n", my_id);
+
 
   scanf("HAND [ %[^\n]\n", temp);
   token = strtok(temp, " ");
@@ -66,6 +71,7 @@ int main()
     token = strtok(NULL, " ");
   }
 
+  // Lê a carta aberta sobre a mesa. Ex: TABLE 8♣
   scanf("TABLE %s\n", temp);
   mesa.valor = temp[0];
   for (i = 0; i < strlen(temp); i++)
@@ -73,6 +79,7 @@ int main()
     temp[i] = temp[i + 1];
   }
   strcpy(mesa.naipe, temp);
+  // === PARTIDA ===
 
   char id[MAX_ID_SIZE];
   char action[MAX_ACTION];
@@ -86,9 +93,11 @@ int main()
 
   while (1)
   {
-
+    // A primeira coisa fazer é "esperar sua vez".
+    // É preciso, então, de um laço enquanto a vez do seu bot não chega.
     do
     {
+
       strcpy(complement, "");
 
       scanf("%s ", action);
@@ -105,10 +114,14 @@ int main()
         }
         else if (mesa.valor == 'C')
         {
+          fprintf(stderr, "naipe mudado %s\n", mesa.naipe);
+          // debug("if do c");
           cardsToBuy = 4;
+          scanf(" %s\n", mesa.naipe);
         }
         else if (mesa.valor == 'A')
         {
+          fprintf(stderr, "naipe mudado %s\n", mesa.naipe);
           scanf(" %s", mesa.naipe);
         }
       }
@@ -119,7 +132,14 @@ int main()
 
     } while (strcmp(action, "TURN") || strcmp(complement, my_id));
 
+    // agora é a vez do seu bot jogar
     debug("----- MINHA VEZ -----");
+
+    // read all cards in hand
+    // for (i = 0; i < cardsInHand; i++)
+    // {
+    //   debug(&mao[i].valor);
+    // }
 
     hasPlayed = 0;
     // trata acao
@@ -128,7 +148,7 @@ int main()
       printf("BUY %d\n", cardsToBuy);
       for (i = 0; i < cardsToBuy; i++)
       {
-        scanf("%s", temp);
+        scanf(" %s\n", temp);
         mao[cardsInHand].valor = temp[0];
         for (j = 0; j < strlen(temp); j++)
         {
@@ -153,7 +173,7 @@ int main()
           if ((mao[i].valor == mesa.valor) || (strcmp(mao[i].naipe, mesa.naipe) == 0))
           {
 
-            if (mao[i].valor == 'A')
+            if (mao[i].valor == 'A' || mao[i].valor == 'C')
             {
               printf("DISCARD %c%s %s\n", mao[i].valor, mao[i].naipe, mao[0].naipe);
             }
