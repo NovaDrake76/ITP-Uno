@@ -114,14 +114,13 @@ int main()
         }
         else if (mesa.valor == 'C')
         {
-          fprintf(stderr, "naipe mudado %s\n", mesa.naipe);
-          // debug("if do c");
+
           cardsToBuy = 4;
           scanf(" %s\n", mesa.naipe);
         }
         else if (mesa.valor == 'A')
         {
-          fprintf(stderr, "naipe mudado %s\n", mesa.naipe);
+
           scanf(" %s", mesa.naipe);
         }
       }
